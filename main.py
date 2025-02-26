@@ -5,6 +5,22 @@ import sys
 pygame.init()
 
 
+class Camera:
+    def __init__(self, width, height):
+        self.dx = 0
+        self.dy = 0
+        self.width = width
+        self.height = height
+
+    def apply(self, obj):
+        obj.rect.x += self.dx
+        obj.rect.y += self.dy
+
+    def update(self, target):
+        self.dx = -(target.rect.x + target.rect.w // 2 - self.width // 2)
+        self.dy = -(target.rect.y + target.rect.h // 2 - self.height // 2)
+
+
 def start_screen():
     intro_text = ["ЗАСТАВКА", "",
                   "Правила игры",
@@ -30,7 +46,7 @@ def start_screen():
                 terminate()
             elif event.type == pygame.KEYDOWN or \
                     event.type == pygame.MOUSEBUTTONDOWN:
-                return  # начинаем игру
+                return
         pygame.display.flip()
         clock.tick(FPS)
 
@@ -125,8 +141,16 @@ FPS = 50
 level_filename = sys.stdin.readline().strip()
 player, _, _ = generate_level(load_level(level_filename))
 
-screen = pygame.display.set_mode((500, 500))
+screen_width, screen_height = 500, 500
+
+camera = Camera(screen_width, screen_height)
+camera.update(player)
+for sprite in all_sprites:
+    camera.apply(sprite)
+
+screen = pygame.display.set_mode((screen_width, screen_height))
 clock = pygame.time.Clock()
+
 start_screen()
 while True:
     for event in pygame.event.get():
@@ -141,6 +165,11 @@ while True:
                 player.move(-50, 0)
             elif event.key == pygame.K_RIGHT:
                 player.move(50, 0)
+
+    camera.update(player)
+
+    for sprite in all_sprites:
+        camera.apply(sprite)
 
     screen.fill(pygame.Color("black"))
     all_sprites.draw(screen)
