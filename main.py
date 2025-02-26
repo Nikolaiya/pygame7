@@ -47,6 +47,9 @@ def load_image(name):
 
 def load_level(filename):
     filename = "data/" + filename
+    if not os.path.isfile(filename):
+        print(f"Файл с уровнем '{filename}' не найден")
+        sys.exit(1)
     # читаем уровень, убирая символы перевода строки
     with open(filename, 'r') as mapFile:
         level_map = [line.strip() for line in mapFile]
@@ -119,7 +122,8 @@ def terminate():
 
 FPS = 50
 
-player, level_x, level_y = generate_level(load_level('map.txt'))
+level_filename = sys.stdin.readline().strip()
+player, _, _ = generate_level(load_level(level_filename))
 
 screen = pygame.display.set_mode((500, 500))
 clock = pygame.time.Clock()
