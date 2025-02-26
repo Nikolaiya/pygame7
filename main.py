@@ -83,8 +83,11 @@ class Player(pygame.sprite.Sprite):
             tile_width * pos_x + 15, tile_height * pos_y + 5)
 
     def move(self, dx, dy):
-        self.rect.x += dx
-        self.rect.y += dy
+        new_rect = self.rect.move(dx, dy)
+        for wall in tiles_group:
+            if wall.image == tile_images['wall'] and new_rect.colliderect(wall.rect):
+                return
+        self.rect = new_rect
 
 
 player = None
