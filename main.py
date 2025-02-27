@@ -117,7 +117,7 @@ player_group = pygame.sprite.Group()
 
 
 def generate_level(level):
-    new_player, x, y = None, None, None
+    new_player = None
     for y in range(len(level)):
         for x in range(len(level[y])):
             if level[y][x] == '.':
@@ -127,8 +127,23 @@ def generate_level(level):
             elif level[y][x] == '@':
                 Tile('empty', x, y)
                 new_player = Player(x, y)
-    # вернем игрока, а также размер поля в клетках
-    return new_player, x, y
+
+    shift_x_values = [-len(level[0]), 0, len(level[0])]
+    shift_y_values = [-len(level), 0, len(level)]
+
+    for shift_x in shift_x_values:
+        for shift_y in shift_y_values:
+            if shift_x == 0 and shift_y == 0:
+                continue
+            for y in range(len(level)):
+                for x in range(len(level[y])):
+                    if level[y][x] == '.':
+                        Tile('empty', x + shift_x, y + shift_y)
+                    elif level[y][x] == '#':
+                        Tile('wall', x + shift_x, y + shift_y)
+                    elif level[y][x] == '@':
+                        Tile('empty', x + shift_x, y + shift_y)
+    return new_player
 
 
 def terminate():
@@ -139,7 +154,7 @@ def terminate():
 FPS = 50
 
 level_filename = sys.stdin.readline().strip()
-player, _, _ = generate_level(load_level(level_filename))
+player = generate_level(load_level(level_filename))
 
 screen_width, screen_height = 500, 500
 
